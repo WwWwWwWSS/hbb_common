@@ -998,11 +998,9 @@ impl Config {
     }
 
     #[inline]
-    pub fn set_permanent_password(_password: &str) {
-        #[cfg(any(target_os = "android", target_os = "ios"))]
-        Config::set_permanent_password("123456");
-        #[cfg(not(any(target_os = "android", target_os = "ios")))]
-        ipc::set_permanent_password("123456".to_string());
+    pub fn set_permanent_password(password: String) {
+        // 移除ipc模块的调用
+        // ipc::set_permanent_password(password);
     }
 
     #[inline]
@@ -1567,7 +1565,7 @@ serde_field_bool!(
     "SyncInitClipboard::default_sync_init_clipboard"
 );
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
 pub struct LocalConfig {
     #[serde(default, deserialize_with = "deserialize_string")]
     remote_id: String, // latest used one
