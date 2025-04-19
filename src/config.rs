@@ -98,9 +98,13 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+// 修改这里的 RENDEZVOUS_SERVERS 常量
+pub const RENDEZVOUS_SERVERS: &[&str] = &["47.107.32.203"];
 
+// 修改这里的 RS_PUB_KEY 常量
+pub const RS_PUB_KEY: &str = "W2tVwoxYW5Yi6k87rSJ2BZg8pebqd+UvRp2vBD2Mc+0=";
+
+// 修改这里的端口配置（如果需要的话）
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
 
