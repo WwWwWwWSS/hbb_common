@@ -220,7 +220,7 @@ pub struct Config2 {
     pub options: HashMap<String, String>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
 pub struct Resolution {
     pub w: i32,
     pub h: i32,
@@ -387,7 +387,7 @@ pub struct PeerInfoSerde {
     pub platform: String,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
 pub struct TransferSerde {
     #[serde(default, deserialize_with = "deserialize_vec_string")]
     pub write_jobs: Vec<String>,
@@ -1002,7 +1002,7 @@ impl Config {
         #[cfg(any(target_os = "android", target_os = "ios"))]
         Config::set_permanent_password("123456");
         #[cfg(not(any(target_os = "android", target_os = "ios")))]
-        allow_err!(ipc::set_permanent_password("123456".to_string()));
+        ipc::set_permanent_password("123456".to_string());
     }
 
     #[inline]
