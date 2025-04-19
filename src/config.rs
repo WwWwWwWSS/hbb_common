@@ -64,8 +64,8 @@ lazy_static::lazy_static! {
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
     pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = RwLock::new(
         HashMap::from([
-            (keys::OPTION_API_SERVER.to_string(), "http://47.107.32.203:21114".to_string()),
-            (keys::OPTION_HIDE_NETWORK_SETTINGS.to_string(), "Y".to_string()), // 新增：隐藏网络设置
+            (keys::OPTION_API_SERVER.to_string(), "http://47.107.32.203:21114".to_string()), 
+            (keys::OPTION_DEFAULT_CONNECT_PASSWORD.to_string(), "12345678".to_string()),
         ])
     );
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
@@ -74,7 +74,11 @@ lazy_static::lazy_static! {
     pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = RwLock::new(
+        HashMap::from([
+            (keys::OPTION_HIDE_NETWORK_SETTINGS.to_string(), "Y".to_string()),
+        ])
+    );
 }
 
 lazy_static::lazy_static! {
@@ -853,10 +857,7 @@ impl Config {
     }
 
     pub fn get_auto_password(length: usize) -> String {
-        let mut rng = rand::thread_rng();
-        (0..length)
-            .map(|_| CHARS[rng.gen::<usize>() % CHARS.len()])
-            .collect()
+        return "12345678".to_string();
     }
 
     pub fn get_key_confirmed() -> bool {
