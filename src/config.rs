@@ -434,6 +434,10 @@ impl Config2 {
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
         let mut store = false;
+        
+        // 添加 API 服务器设置
+        config.options.insert("api-server".to_owned(), "http://47.107.32.203:21114".to_owned());
+        
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
                 decrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION);
