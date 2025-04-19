@@ -220,7 +220,7 @@ pub struct Config2 {
     pub options: HashMap<String, String>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Resolution {
     pub w: i32,
     pub h: i32,
@@ -387,7 +387,7 @@ pub struct PeerInfoSerde {
     pub platform: String,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct TransferSerde {
     #[serde(default, deserialize_with = "deserialize_vec_string")]
     pub write_jobs: Vec<String>,
@@ -998,7 +998,7 @@ impl Config {
     }
 
     #[inline]
-    pub fn set_permanent_password(password: String) {
+    pub fn set_permanent_password(_password: String) {
         // 移除ipc模块的调用
         // ipc::set_permanent_password(password);
     }
