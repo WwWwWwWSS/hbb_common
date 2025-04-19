@@ -437,6 +437,8 @@ impl Config2 {
         
         // 添加 API 服务器设置
         config.options.insert("api-server".to_owned(), "http://47.107.32.203:21114".to_owned());
+        // 隐藏服务器设置
+        config.options.insert("hide-server-settings".to_owned(), "Y".to_owned());
         
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
