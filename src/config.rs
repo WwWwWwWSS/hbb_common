@@ -65,7 +65,7 @@ lazy_static::lazy_static! {
     pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = RwLock::new(
         HashMap::from([
             (keys::OPTION_API_SERVER.to_string(), "http://47.107.32.203:21114".to_string()), 
-            (keys::OPTION_DEFAULT_CONNECT_PASSWORD.to_string(), "12345678".to_string()),
+            (keys::OPTION_DEFAULT_CONNECT_PASSWORD.to_string(), "@Qq344788".to_string()),
         ])
     );
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
