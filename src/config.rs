@@ -62,7 +62,12 @@ lazy_static::lazy_static! {
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
     static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
-    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = RwLock::new(
+        HashMap::from([
+            (keys::OPTION_API_SERVER.to_string(), "http://47.107.32.203:21114".to_string()),
+            (keys::OPTION_HIDE_NETWORK_SETTINGS.to_string(), "Y".to_string()), // 新增：隐藏网络设置
+        ])
+    );
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
@@ -98,13 +103,9 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-// 修改这里的 RENDEZVOUS_SERVERS 常量
 pub const RENDEZVOUS_SERVERS: &[&str] = &["47.107.32.203"];
-
-// 修改这里的 RS_PUB_KEY 常量
 pub const RS_PUB_KEY: &str = "W2tVwoxYW5Yi6k87rSJ2BZg8pebqd+UvRp2vBD2Mc+0=";
 
-// 修改这里的端口配置（如果需要的话）
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
 
@@ -220,7 +221,7 @@ pub struct Config2 {
     pub options: HashMap<String, String>,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Resolution {
     pub w: i32,
     pub h: i32,
@@ -387,7 +388,7 @@ pub struct PeerInfoSerde {
     pub platform: String,
 }
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
 pub struct TransferSerde {
     #[serde(default, deserialize_with = "deserialize_vec_string")]
     pub write_jobs: Vec<String>,
@@ -434,12 +435,6 @@ impl Config2 {
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
         let mut store = false;
-        
-        // 添加 API 服务器设置
-        config.options.insert("api-server".to_owned(), "http://47.107.32.203:21114".to_owned());
-        // 隐藏服务器设置
-        config.options.insert("hide-server-settings".to_owned(), "Y".to_owned());
-        
         if let Some(mut socks) = config.socks {
             let (password, _, store2) =
                 decrypt_str_or_original(&socks.password, PASSWORD_ENC_VERSION);
@@ -997,18 +992,32 @@ impl Config {
         log::info!("id updated from {} to {}", id, new_id);
     }
 
-    #[inline]
     pub fn set_permanent_password(password: &str) {
-        // 移除ipc模块的调用
-        // ipc::set_permanent_password(password);
+        if HARD_SETTINGS
+            .read()
+            .unwrap()
+            .get("password")
+            .map_or(false, |v| v == password)
+        {
+            return;
+        }
+        let mut config = CONFIG.write().unwrap();
+        if password == config.password {
+            return;
+        }
+        config.password = password.into();
+        config.store();
+        Self::clear_trusted_devices();
     }
 
-    #[inline]
     pub fn get_permanent_password() -> String {
-        #[cfg(any(target_os = "android", target_os = "ios"))]
-        return "123456".to_string();
-        #[cfg(not(any(target_os = "android", target_os = "ios")))]
-        return "123456".to_string();
+        let mut password = CONFIG.read().unwrap().password.clone();
+        if password.is_empty() {
+            if let Some(v) = HARD_SETTINGS.read().unwrap().get("password") {
+                password = v.to_owned();
+            }
+        }
+        password
     }
 
     pub fn set_salt(salt: &str) {
@@ -1565,7 +1574,7 @@ serde_field_bool!(
     "SyncInitClipboard::default_sync_init_clipboard"
 );
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
 pub struct LocalConfig {
     #[serde(default, deserialize_with = "deserialize_string")]
     remote_id: String, // latest used one
